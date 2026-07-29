@@ -1,0 +1,22 @@
+# Backend
+fastapi
+uvicorn[standard]
+pymongo
+python-dotenv
+requests
+
+# UI
+streamlit
+
+# RAG (used in later phases)
+langgraph
+faiss-cpu
+rank-bm25
+sentence-transformers
+pandas
+pypdf
+google-genai
+groq
+pyyaml
+
+redis

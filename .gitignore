@@ -1,0 +1,18 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+ # Data / indices (generated locally, don't commit)
+# data/uploads/*
+# !data/uploads/.gitkeep
+# *.faiss
+# *.index
+# eval/results/
+
+# # OS
+# .DS_Store
