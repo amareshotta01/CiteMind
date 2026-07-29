@@ -16,6 +16,8 @@ from backend.ingest.index_store import save_index
 from backend.retrieval.hybrid import hybrid_search
 from backend.retrieval.rerank import rerank
 from backend.agents.synthesizer import synthesize_answer
+from backend.agents.conflict_checker import check_conflicts
+from backend.structured.table_qa import store_table, has_table, query_table
 
 app = FastAPI(title="CiteMind API")
 
@@ -73,18 +75,30 @@ async def upload_document(notebook_id: str, file: UploadFile = File(...)):
         }
 
     elif doc["type"] == "csv":
+        store_table(notebook_id, file.filename, doc["content"])
         return {
             "notebook_id": notebook_id,
             "filename": file.filename,
-            "status": "received (CSV — structured path not yet implemented)",
+            "rows": len(doc["content"]),
+            "columns": list(doc["content"].columns),
+            "status": "table stored",
         }
 
 
 @app.post("/query", response_model=QueryResponse)
 def query_notebook(req: QueryRequest):
-    """Real pipeline: hybrid search -> rerank -> synthesize with citations."""
+    if has_table(req.notebook_id):
+        result = query_table(req.notebook_id, req.question)
+        return QueryResponse(**result)
+
     provider = get_provider()
     candidates = hybrid_search(req.notebook_id, req.question, provider, top_k=20)
     top_chunks = rerank(req.question, candidates, top_k=5)
+
+    conflict_result = check_conflicts(top_chunks)
     result = synthesize_answer(req.question, top_chunks)
+
+    if conflict_result["has_conflict"]:
+        result["answer"] = f"⚠️ Note: sources disagree on this — {conflict_result['details']}\n\n{result['answer']}"
+
     return QueryResponse(**result)

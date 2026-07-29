@@ -1,10 +1,10 @@
 """
 Turns retrieved chunks into a grounded answer with enforced citations.
-The model is instructed to only answer from the given chunks and to
-say so explicitly if it can't — this is the actual mechanism behind
-'citation enforcement', not just a UI label.
+Only chunks the model actually cited (via [1], [2], etc. in its answer)
+are returned in the citations list — not everything that was retrieved.
 """
 
+import re
 from backend.providers.router import generate_with_fallback
 
 SYSTEM_PROMPT = """You are a document Q&A assistant. Answer the user's question using ONLY the provided source excerpts below. Each excerpt is labeled with a source number.
@@ -16,10 +16,6 @@ Rules:
 
 
 def synthesize_answer(question: str, chunks: list[dict]) -> dict:
-    """
-    Returns {"answer": str, "citations": [{"doc": ..., "page": ..., "snippet": ...}]}
-    citations list mirrors the source numbers used in the answer text.
-    """
     if not chunks:
         return {
             "answer": "I don't have any documents to search yet — please upload one first.",
@@ -32,12 +28,14 @@ def synthesize_answer(question: str, chunks: list[dict]) -> dict:
     )
 
     prompt = f"Source excerpts:\n\n{excerpts_text}\n\nQuestion: {question}"
-
     answer = generate_with_fallback(prompt, system=SYSTEM_PROMPT)
 
+    # Only include chunks whose [N] marker actually appears in the answer
+    cited_numbers = {int(n) for n in re.findall(r"\[(\d+)\]", answer)}
     citations = [
         {"doc": c.get("doc_id", "unknown"), "page": c["page"], "snippet": c["text"][:150]}
-        for c in chunks
+        for i, c in enumerate(chunks, start=1)
+        if i in cited_numbers
     ]
 
     return {"answer": answer, "citations": citations}
