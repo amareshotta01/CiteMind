@@ -1,0 +1,38 @@
+[
+  {
+    "question": "What was the quarterly revenue for the product division?",
+    "expected_page": 1,
+    "expected_keywords": ["412", "revenue"]
+  },
+  {
+    "question": "By what percentage did revenue increase?",
+    "expected_page": 1,
+    "expected_keywords": ["11", "percent"]
+  },
+  {
+    "question": "What infrastructure change happened this quarter?",
+    "expected_page": 2,
+    "expected_keywords": ["database", "migrat"]
+  },
+  {
+    "question": "How much did latency improve after the migration?",
+    "expected_page": 2,
+    "expected_keywords": ["18", "millisecond"]
+  },
+  {
+    "question": "Was there any downtime during the migration?",
+    "expected_page": 2,
+    "expected_keywords": ["no", "downtime"]
+  },
+  {
+    "question": "What does the team plan to expand in the future?",
+    "expected_page": 3,
+    "expected_keywords": ["hybrid", "retrieval", "format"]
+  },
+  {
+    "question": "What was the churn rate?",
+    "expected_page": 1,
+    "expected_keywords": ["4.2", "7"],
+    "expect_conflict": true
+  }
+]

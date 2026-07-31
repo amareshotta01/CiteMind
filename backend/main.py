@@ -95,7 +95,7 @@ def query_notebook(req: QueryRequest):
     candidates = hybrid_search(req.notebook_id, req.question, provider, top_k=20)
     top_chunks = rerank(req.question, candidates, top_k=5)
 
-    conflict_result = check_conflicts(top_chunks)
+    conflict_result = check_conflicts(req.question, top_chunks)
     result = synthesize_answer(req.question, top_chunks)
 
     if conflict_result["has_conflict"]:

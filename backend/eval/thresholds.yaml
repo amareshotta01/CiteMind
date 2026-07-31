@@ -1,0 +1,6 @@
+# Minimum acceptable scores. If run_eval.py scores below any of these,
+# it exits with code 1 — CI treats that as a failed build.
+min_retrieval_hit_rate: 0.8    # 80% of questions must retrieve their expected page
+min_keyword_match_rate: 0.6     # 60% of expected keywords must appear in answers on average
+min_citation_accuracy: 0.7       # 70% of answers must cite the correct page
+min_conflict_accuracy: 0.85       # 85% of conflict-detection expectations must be met
